@@ -1,0 +1,12 @@
+﻿@model ImagePost
+
+@{
+    ViewData["Title"] = "Detect";
+}
+<h2 id="message"></h2>
+<div id="DeviceName" hidden>@Model.DeviceName</div>
+<video id="camStream"></video>
+<canvas id="canvas" hidden></canvas>
+<canvas id="canvasFinal"></canvas>
+<canvas id="canvasUpload"></canvas>
+<script type="text/javascript" src="/js/MotionDetector.js"></script>

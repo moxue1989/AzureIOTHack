@@ -1,0 +1,18 @@
+﻿@using Microsoft.Azure.CognitiveServices.Vision.Face.Models
+@model IList<Person>
+
+@{
+    ViewData["Title"] = "Persons";
+}
+
+@foreach (Person person in Model)
+{
+    <h4>Person Name: @person.Name</h4>
+    <h4>Person ID: @person.PersonId</h4>
+    <h4>Face IDs:</h4>
+    foreach (Guid guid in person.PersistedFaceIds)
+    {
+        <p>@guid.ToString()</p>
+    }
+}
+

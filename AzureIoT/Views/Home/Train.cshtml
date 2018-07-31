@@ -1,0 +1,79 @@
+﻿@model TrainModel
+
+@{
+    ViewData["Title"] = "Train";
+}
+
+
+<div class="row">
+    <div class="col-md-6">
+        <video id="video" autoplay></video>
+        <canvas id="canvas" hidden></canvas>
+        <button onclick="capture()">Capture</button>
+    </div>
+    <div class="col-md-6">
+        <form asp-action="Train" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Person Name</label>
+                <input name="Name" class="form-control"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group" id="Base64Images">
+                <label>Webcam Images</label>
+                <span asp-validation-for="Base64Images" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Uploaded Images</label>
+                <input type="file" name="UploadedImages" class="form-control" multiple/>
+                <span asp-validation-for="UploadedImages" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add Person" class="btn btn-default"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    var constraints = {
+        audio: false,
+        video: { width: 640, height: 480 }
+    };
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then(success)
+        .catch(error);
+
+    function success(stream) {
+        var video = document.getElementById('video');
+        video.srcObject = stream;
+    }
+
+    function error(errorMsg) {
+        console.log(errorMsg);
+    }
+
+    function capture() {
+        var video = document.getElementById('video');
+        var canvas = document.createElement('canvas');
+        canvas.width = 640;
+        canvas.height = 480;
+        var context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, 640, 480);
+
+        var imageInput = $('#Base64Images');
+        var dataUrl = canvas.toDataURL();
+        dataUrl = dataUrl.replace(/^data:image\/(png|jpg);base64,/, "");
+
+        var inputElement = document.createElement('input');
+        var input = $(inputElement);
+        input.attr('name', "Base64Images");
+        input.hide();
+        input.val(dataUrl);
+        var canvas2 = document.createElement('canvas');
+        var context2 = canvas2.getContext('2d');
+        context2.scale(0.3, 0.3);
+        context2.drawImage(canvas, 0, 0);
+        imageInput.append(canvas2);
+        imageInput.append(input);
+    }
+</script>
