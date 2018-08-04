@@ -11,14 +11,12 @@ namespace AzureIoT.Services
 {
     public class IotMessageSender
     {
-        //private static ConcurrentDictionary<string, DeviceClient> _connectionStringToDeviceClients;
         public static Dictionary<string, string> DeviceToConnectionString = 
             new Dictionary<string, string>
             {
-                // Add devices and their names here
-                {"AlphaIotDevice", "DEVICE_CONNECTION_STRING_ONE" },
-                {"BetaIotDevice", "DEVICE_CONNECTION_STRING_ONE" },
-                {"CharlieIotDevice", "DEVICE_CONNECTION_STRING_ONE" }
+                {"AlphaIotDevice", "{Iot Device Connection String One}" },
+                {"BetaIotDevice", "{Iot Device Connection String Two}" },
+                {"CharlieIotDevice", "{Iot Device Connection String Three}" }
             };
         
         public static async void SendDeviceToCloudMessagesAsync(string deviceId, string message)

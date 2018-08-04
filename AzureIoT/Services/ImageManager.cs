@@ -10,7 +10,7 @@ namespace AzureIoT.Services
     public class ImageManager : IImageManager
     {
         private static readonly string StorageName = "mogeneral";
-        private static readonly string StorageApiKey = "{STORAGE_KEY}";
+        private static readonly string StorageApiKey = "{Azure blob storage API key}";
         private static readonly string ImageContainer = "azureiot";
 
         public async Task<string> UploadImageAsync(MemoryStream stream, string imageName)

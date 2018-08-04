@@ -3,21 +3,47 @@
 @{
     ViewData["Title"] = "ChooseDevice";
 }
+<div class="jumbotron">
+    <h1 class="text-center">Welcome to Mobot Demo!</h1>
+    <h2 class="text-primary">This is demo of the Mobot IOT security system, pick any of the three options in the menu above to get started:</h2>
+    <div class="well">
+        <p class="text-danger">- This demo requires permission to use your Webcam!</p>
+        <p class="text-warning">- Use the "Train" tab to add your own face to the face recognition algorithm!</p>
+        <p class="text-info">- See all the people added with the "Persons" tab</p>
+        <p class="text-success">- Or select a device below to start the demo!</p>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <form asp-action="Index">
+                <div class="form-group-lg">
+                    <label asp-for="DeviceName" class="text-primary"></label>
+                    <select asp-for="DeviceName" class="form-control"
+                            asp-items="@Model?.DeviceList"></select>
+                    <span asp-validation-for="DeviceName" class="text-danger"></span>
+                </div>
+                <br />
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Index">
-            <div class="form-group">
-                <label asp-for="DeviceName"></label>
-                <select asp-for="DeviceName" class="form-control"
-                        asp-items="@Model?.DeviceList">
-                    <option value="">-- Select Device --</option>
-                </select>
-                <span asp-validation-for="DeviceName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Select" class="btn btn-default" />
-            </div>
-        </form>
+                <div class="form-group-lg">
+                    <label asp-for="Email" class="text-primary"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-group">
+                    <input type="submit" value="Demo" class="btn btn-block btn-lg btn-danger" />
+                </div>
+            </form>
+        </div>
+        <div class="col-md-3"></div>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-4">
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

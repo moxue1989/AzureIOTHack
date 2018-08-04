@@ -3,10 +3,45 @@
 @{
     ViewData["Title"] = "Detect";
 }
-<h2 id="message"></h2>
 <div id="DeviceName" hidden>@Model.DeviceName</div>
-<video id="camStream"></video>
 <canvas id="canvas" hidden></canvas>
-<canvas id="canvasFinal"></canvas>
-<canvas id="canvasUpload"></canvas>
+
+<h4 class="text-info text-center">Demo of the face motion detection algorithm</h4>
+<div class="well">
+    <p class="text-warning">
+        - When Mobot detects motion, it will then take a snapshot and send it to Azure Face API for analysis.
+    </p>
+    <p class="text-warning">
+        - If a face is detected in the snapshot, the image is uploaded and sent to IOT hub and logged, a Azure Function processes the results and
+        sends notifications.
+    </p>
+    <p class="text-warning">
+        - If you trained your face in the "Train" tab, then it should be able to detect who you are, otherwise it will flag you as an unknown person.
+    </p>
+    <p class="text-warning">
+        - If you entered an email, you will also receive an email notification of the results in JSON format. Results will also be displayed here for demo purposes.
+    </p>
+    <p class="text-warning">
+        - The free tier Azure Face API has a 20 requests/minute rate limit, if the page fails to respond, just wait a bit :).
+    </p>
+</div>
+
+<h2 class="text-danger text-center" id="message"></h2>
+
+<div class="row">
+    <div class="col-md-6  col-sm-12">
+        <h3 class="text-info text-center">Camera Feed:</h3>
+        <video class="center-block" id="camStream"></video>
+    </div>
+    <div class="col-md-6 col-sm-12">
+        <h3 class="text-info text-center">Motion Detection Visualization:</h3>
+        <canvas class="center-block" id="canvasFinal"></canvas>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <h3 class="text-info text-center">Uploaded Snapshot:</h3>
+        <canvas class="center-block" id="canvasUpload"></canvas>
+    </div>
+</div>
 <script type="text/javascript" src="/js/MotionDetector.js"></script>

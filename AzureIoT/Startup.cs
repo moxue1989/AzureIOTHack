@@ -29,6 +29,12 @@ namespace AzureIoT
             {
                 builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
             }));
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(10);
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,11 +49,13 @@ namespace AzureIoT
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+            var options = new RewriteOptions()
+                .AddRedirectToHttpsPermanent();
 
+            app.UseRewriter(options);
             app.UseStaticFiles();
-
             app.UseCors("MyPolicy");
-
+            app.UseSession();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

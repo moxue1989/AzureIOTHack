@@ -102,7 +102,7 @@ var MotionDetector = (function () {
                     imageScore++;
                 }
             }
-            if (imageScore > 10000) {
+            if (imageScore > 5000) {
                 currentValue++;
                 if (currentValue > pictureThreshold && !timeOut) {
                     captureAndUploadImage();
@@ -136,15 +136,15 @@ var MotionDetector = (function () {
             dataType: "text",
             success: function (response) {
                 console.log(response);
-                $('#message').html("Detected: " + response);
+                $('#message').html(response);
             },
             error: function () {
-                $('#message').html("");
+                $('#message').html("Rate Limit exceeded! Please wait a bit.");
                 console.log("failure");
             }
         });
         timeOut = true;
-        setTimeout(clearTimer, 4000);
+        setTimeout(clearTimer, 5000);
     }
 
     function clearTimer() {

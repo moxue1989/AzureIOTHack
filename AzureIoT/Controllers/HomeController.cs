@@ -18,10 +18,14 @@ namespace AzureIoT.Controllers
 {
     public class HomeController : Controller
     {
-        public static string FaceApiKey = "{KEY_1}";
-        public static string FaceApiKeyAlt = "{ALTERNATE_KEY}";
+
+        public static string FaceApiKey = "{FaceApiKey}";
+        public static string FaceApiKeyAlt = "{FaceApiKeyAlt}";
         public static string BaseUri = "https://canadacentral.api.cognitive.microsoft.com/face/v1.0";
         private readonly IImageManager _imageManager;
+
+        [TempData]
+        public string Email { get; set; }
 
         readonly FaceClient _client = new FaceClient(new ApiKeyServiceClientCredentials(FaceApiKey))
         {
@@ -52,9 +56,18 @@ namespace AzureIoT.Controllers
         [HttpPost]
         public IActionResult Index(ChooseDevice device)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
             if (!IotMessageSender.DeviceToConnectionString.Keys.Contains(device.DeviceName))
             {
                 return Index();
+            }
+            Email = device.Email;
+            if (Email != null)
+            {
+                HttpContext.Session.SetString("Email", Email);
             }
             return RedirectToAction("Detect", "home", new { deviceName = device.DeviceName });
         }
@@ -117,13 +130,16 @@ namespace AzureIoT.Controllers
                     DeviceName = image.DeviceName,
                     DateTime = dateTime.ToString("G")
                 };
-                
+                string email = HttpContext.Session.GetString("Email");
                 string serializeObject = JsonConvert.SerializeObject(results);
+                if (email != null)
+                {
+                    await EmailSender.SendEmailsAsync(email, "Mobot Alert", serializeObject);
+                }
                 IotMessageSender.SendDeviceToCloudMessagesAsync(image.DeviceName, serializeObject);
                 return Ok(results.ToString());
             }
-            return NotFound();
-
+            return Ok("No face detected!");
         }
 
         private IList<Person> GetPersons()
@@ -179,10 +195,19 @@ namespace AzureIoT.Controllers
         [HttpPost]
         public async Task<IActionResult> Train(TrainModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
             HttpOperationResponse<Person> response = await _client.PersonGroupPerson.CreateWithHttpMessagesAsync("1", model.Name);
 
             if (model.Base64Images != null)
             {
+                if (model.Base64Images.Count > 8)
+                {
+                    return Error();
+                }
+
                 foreach (string imageString in model.Base64Images)
                 {
                     byte[] bytes = Convert.FromBase64String(imageString);
@@ -204,6 +229,11 @@ namespace AzureIoT.Controllers
 
             if (model.UploadedImages != null)
             {
+                if (model.UploadedImages.Count > 8)
+                {
+                    return Error();
+                }
+
                 foreach (IFormFile uploadedImage in model.UploadedImages)
                 {
                     BinaryReader reader = new BinaryReader(uploadedImage.OpenReadStream());

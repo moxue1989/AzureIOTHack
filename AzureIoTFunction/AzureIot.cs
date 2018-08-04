@@ -20,7 +20,7 @@ namespace AzureIoTFunction
 
             HttpClient client = new HttpClient
             {
-                BaseAddress = new Uri("{SLACK_INCOMING_WEBHOOK_KEY}")
+                BaseAddress = new Uri("{Slack Webhook post endpoint}")
             };
 
             string serializeObject = JsonConvert.SerializeObject(message);
