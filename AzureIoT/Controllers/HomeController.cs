@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Rest;
 using Newtonsoft.Json;
 
@@ -23,6 +25,7 @@ namespace AzureIoT.Controllers
         public static string FaceApiKeyAlt = "{FaceApiKeyAlt}";
         public static string BaseUri = "https://canadacentral.api.cognitive.microsoft.com/face/v1.0";
         private readonly IImageManager _imageManager;
+        private readonly IMemoryCache _memoryCache;
 
         [TempData]
         public string Email { get; set; }
@@ -37,11 +40,11 @@ namespace AzureIoT.Controllers
             BaseUri = new Uri(BaseUri)
         };
 
-        private IList<Person> _persons;
-
-        public HomeController(IImageManager imageManager)
+        public HomeController(IImageManager imageManager,
+            IMemoryCache memoryCache)
         {
             _imageManager = imageManager;
+            _memoryCache = memoryCache;
         }
 
         public IActionResult Index()
@@ -142,13 +145,15 @@ namespace AzureIoT.Controllers
             return Ok("No face detected!");
         }
 
-        private IList<Person> GetPersons()
+        private List<Person> GetPersons()
         {
-            if (_persons == null)
-            {
-                UpdatePersons();
-            }
-            return _persons;
+            return (List<Person>)_memoryCache.GetOrCreate("Persons", c =>
+           {
+               c.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+               return _client
+                   .PersonGroupPerson
+                   .ListWithHttpMessagesAsync("1").Result.Body;
+           });
         }
 
         private DetectedPerson GetPersonFromResult(IdentifyResult result, List<Person> persons)
@@ -172,19 +177,12 @@ namespace AzureIoT.Controllers
 
         public IActionResult Persons()
         {
-            if (_persons == null)
-            {
-                UpdatePersons();
-            }
-            return View(_persons);
+            return View(GetPersons());
         }
 
         private void UpdatePersons()
         {
-            HttpOperationResponse<IList<Person>> response = _client
-                .PersonGroupPerson
-                .ListWithHttpMessagesAsync("1").Result;
-            _persons = response.Body;
+            _memoryCache.Remove("Persons");
         }
 
         public IActionResult Train()

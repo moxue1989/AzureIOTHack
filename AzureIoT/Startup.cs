@@ -30,6 +30,8 @@ namespace AzureIoT
                 builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
             }));
 
+            services.AddMemoryCache();
+
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(10);
